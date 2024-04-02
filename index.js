@@ -1,70 +1,62 @@
-//Your code here
-const filmDetails = document.getElementById("film-descr")
+const filmUrl = "http://localhost:3000/films";
+const filmBar = document.getElementById("films");
+const filmPoster = document.getElementById("poster");
+const filmTitle = document.getElementById("title");
+const filmRuntime = document.getElementById("runtime");
+const filmInfo = document.getElementById("film-info");
+const filmShowtime = document.getElementById("showtime");
+const filmRemainingTickets = document.getElementById("ticket-num");
 
-//Fetches all our data from our film api
-function loadFilms() {
-    fetch("http://localhost:3000/films")
-    .then((response)=> response.json())
-    .then((data => data.films.forEach(films => displayfilmNames(films))));
+let filmList = [];
+
+fetch(`${filmUrl}/1`)
+    .then(res => res.json())
+    .then(displayFirstFilm);
+
+function displayFirstFilm(film) {
+    displayFilmInfo(film);
 }
 
-//fetches and displays the first films data
-function dispfirstfilm() {
-    fetch("http://localhost:3000/films" )
-    .then((response)=> response.json())
-    .then((data => displayMovieDetails(data.films[0])))
+fetch(filmUrl)
+    .then(res => res.json())
+    .then(json => {
+        filmList = json;
+        renderFilms();
+    });
+
+function renderFilms() {
+    filmBar.innerHTML = "";
+    filmList.forEach(displayFilms);
 }
 
-//displays all the films titles on the left menu
-function displayfilmNames(films) {
-    const filmNames = document.createElement("li")
-    filmNames.className= ("film-list")
-    filmNames.textContent= films.title
-    filmDetails.append(filmNames)
+function displayFilms(film) {
+    const filmCard = createFilmCard(film);
+    filmBar.appendChild(filmCard);
+    filmCard.addEventListener("click", () => displayFilmInfo(film));
+}
 
-    //displays a films data when a film title is clicked
-    filmNames.addEventListener("click", function onclick() {
-       displayMovieDetails(films);
-    })
+function createFilmCard(film) {
+    const filmCard = document.createElement("li");
+    filmCard.classList.add("film");
+    filmCard.textContent = film.title;
+    return filmCard;
+}
+
+function displayFilmInfo(film) {
+    filmPoster.src = film.poster;
+    filmPoster.alt = film.title;
+    filmTitle.textContent = film.title;
+    filmRuntime.textContent = `${film.runtime} minutes`;
+    filmInfo.textContent = film.description;
+    filmShowtime.textContent = film.showtime;
+    filmRemainingTickets.textContent = film.capacity - film.tickets_sold;
+}
+
+document.getElementById("buy-ticket").addEventListener("click", buyTicket);
+function buyTicket() {
+    const remainingTickets = parseInt(filmRemainingTickets.textContent);
+    if (remainingTickets > 0) {
+        filmRemainingTickets.textContent = remainingTickets - 1;
+    }
+}
    
-}
-
-//This code shows a films details
-function displayMovieDetails(films) {
-    const filmName = document.getElementById("film-name")
-    const filmImg = document.getElementById("film-image")
-    const filmDescr = document.getElementById("film-description")
-    const filmRuntime = document.getElementById("film-runtime")
-    const filmShowtime = document.getElementById("film-showtime")
-    const availabletickets = document.getElementById("available-tickets")
-    filmName.textContent= films.title
-    filmImg.src= films.poster
-    filmDescr.textContent= films.description
-    filmRuntime.textContent=`Runtime: ${films.runtime}minutes`
-    filmShowtime.textContent=`Time: ${films.showtime}`
-    let remaindertickets = films.capacity - films.tickets_sold
-    availabletickets.textContent=`Available tickets: ${remaindertickets}`
-    const filmButton = document.getElementById("ticket-buyer")
-    filmButton.dataset.id = films.id
-
-    //This button enables us to purchase a ticket
-    filmButton.addEventListener("click", function reduceTickets() {
-        if (remaindertickets>=0) {
-            availabletickets.textContent =`Available tickets: ${remaindertickets--}`
-        }
-        else if (remaindertickets < 0) {
-            availabletickets.textcontent=`Available tickets: ${remaindertickets=0}`
-            filmButton.innerText= 'Sold out'
-        }
-    })
-
-
-}
-
-
-document.addEventListener("DOMContentLoaded", (e) => {
-    console.log("The DOM has loaded")
-    loadFilms()
-    dispfirstfilm()
-
-})
