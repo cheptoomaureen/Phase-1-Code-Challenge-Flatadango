@@ -1,3 +1,4 @@
+//Your code here
 const filmUrl = "http://localhost:3000/films";
 const filmBar = document.getElementById("films");
 const filmPoster = document.getElementById("poster");
@@ -9,9 +10,12 @@ const filmRemainingTickets = document.getElementById("ticket-num");
 
 let filmList = [];
 
+
 fetch(`${filmUrl}/1`)
     .then(res => res.json())
     .then(displayFirstFilm);
+
+
 
 function displayFirstFilm(film) {
     displayFilmInfo(film);
@@ -24,6 +28,7 @@ fetch(filmUrl)
         renderFilms();
     });
 
+
 function renderFilms() {
     filmBar.innerHTML = "";
     filmList.forEach(displayFilms);
@@ -35,12 +40,16 @@ function displayFilms(film) {
     filmCard.addEventListener("click", () => displayFilmInfo(film));
 }
 
+
+
 function createFilmCard(film) {
     const filmCard = document.createElement("li");
     filmCard.classList.add("film");
     filmCard.textContent = film.title;
     return filmCard;
 }
+
+//to display items for each film
 
 function displayFilmInfo(film) {
     filmPoster.src = film.poster;
@@ -52,6 +61,8 @@ function displayFilmInfo(film) {
     filmRemainingTickets.textContent = film.capacity - film.tickets_sold;
 }
 
+//to show number of tickets left
+
 document.getElementById("buy-ticket").addEventListener("click", buyTicket);
 function buyTicket() {
     const remainingTickets = parseInt(filmRemainingTickets.textContent);
@@ -59,4 +70,3 @@ function buyTicket() {
         filmRemainingTickets.textContent = remainingTickets - 1;
     }
 }
-   
